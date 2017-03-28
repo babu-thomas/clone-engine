@@ -2,7 +2,7 @@
 
 #include <string>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+#include <glm/fwd.hpp>
 
 namespace clone { namespace graphics {
 

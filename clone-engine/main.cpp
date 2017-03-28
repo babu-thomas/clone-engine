@@ -1,4 +1,6 @@
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "src/graphics/window.h"
 
 // To enable NVIDIA Graphics card
@@ -17,16 +19,6 @@ int main()
 	while (!window.closed())
 	{
 		window.clear();
-		if (window.isKeyPressed(GLFW_KEY_A))
-		{
-			std::cout << "A pressed!" << std::endl;
-		}
-		if (window.isKeyPressed(GLFW_MOUSE_BUTTON_LEFT))
-		{
-			std::cout << "Mouse left pressed!" << std::endl;
-		}
-		glm::vec2 pos = window.getMousePosition();
-		std::cout << "Mouse position: " << pos.x << ", " << pos.y << std::endl;
 		glBegin(GL_TRIANGLES);
 		glVertex2f(-0.5f, -0.5f);
 		glVertex2f( 0.0f,  0.5f);
