@@ -1,4 +1,6 @@
 #include "shader.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "../utils/fileutils.h"
 
 namespace clone { namespace graphics {
@@ -6,16 +8,47 @@ namespace clone { namespace graphics {
 	Shader::Shader(const std::string & vertPath, const std::string & fragPath):
 		m_vertPath(vertPath), m_fragPath(fragPath)
 	{
-		m_shaderId = load();
+		m_programId = load();
 	}
 
 	Shader::~Shader()
 	{
+		glDeleteProgram(m_programId);
+	}
+
+	void Shader::setUniform1f(const GLchar *name, float value)
+	{
+		glUniform1f(getUniformLocation(name), value);
+	}
+
+	void Shader::setUniform1i(const GLchar *name, int value)
+	{
+		glUniform1i(getUniformLocation(name), value);
+	}
+
+	void Shader::setUniform2f(const GLchar *name, const glm::vec2& value)
+	{
+		glUniform2f(getUniformLocation(name), value.x, value.y);
+	}
+
+	void Shader::setUniform3f(const GLchar *name, const glm::vec3& value)
+	{
+		glUniform3f(getUniformLocation(name), value.x, value.y, value.z);
+	}
+
+	void Shader::setUniform4f(const GLchar * name, const glm::vec4 & value)
+	{
+		glUniform4f(getUniformLocation(name), value.x, value.y, value.z, value.w);
+	}
+
+	void Shader::setUniformMat4(const GLchar *name, const glm::mat4& value)
+	{
+		glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
 	}
 
 	void Shader::enable() const
 	{
-		glUseProgram(m_shaderId);
+		glUseProgram(m_programId);
 	}
 
 	void Shader::disable() const
@@ -115,6 +148,12 @@ namespace clone { namespace graphics {
 		}
 
 		return false;
+	}
+
+	GLint Shader::getUniformLocation(const GLchar *name)
+	{
+		//TODO: Cache the results as this is a slow operation
+		return glGetUniformLocation(m_programId, name);
 	}
 
 }
