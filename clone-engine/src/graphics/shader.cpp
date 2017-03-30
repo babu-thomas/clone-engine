@@ -5,7 +5,7 @@
 
 namespace clone { namespace graphics {
 
-	Shader::Shader(const std::string & vertPath, const std::string & fragPath):
+	Shader::Shader(const std::string& vertPath, const std::string& fragPath):
 		m_vertPath(vertPath), m_fragPath(fragPath)
 	{
 		m_programId = load();
@@ -124,8 +124,8 @@ namespace clone { namespace graphics {
 		{
 			//TODO: Replace number with constant
 			GLchar error[1024] = { 0 };
-			glGetProgramInfoLog(shader, sizeof(error), NULL, error);
-			std::cerr << errorMsg << ": " << error << std::endl;
+			glGetShaderInfoLog(shader, sizeof(error), NULL, error);
+			std::cerr << errorMsg << ":\n" << error << std::endl;
 			return true;
 		}
 
@@ -133,7 +133,7 @@ namespace clone { namespace graphics {
 	}
 
 	bool Shader::checkShaderProgramError(GLuint program, GLuint flag,
-		const std::string & errorMsg) const
+		const std::string& errorMsg) const
 	{
 		GLint success = 0;
 		glGetProgramiv(program, flag, &success);
@@ -143,7 +143,7 @@ namespace clone { namespace graphics {
 			//TODO: Replace number with constant
 			GLchar error[1024] = { 0 };
 			glGetProgramInfoLog(program, sizeof(error), NULL, error);
-			std::cerr << errorMsg << ": " << error << std::endl;
+			std::cerr << errorMsg << ":\n" << error << std::endl;
 			return true;
 		}
 
