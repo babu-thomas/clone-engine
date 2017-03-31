@@ -3,6 +3,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "src/graphics/shader.h"
 #include "src/graphics/window.h"
+#include "src/graphics/buffers/buffer.h"
+#include "src/graphics/buffers/indexbuffer.h"
+#include "src/graphics/buffers/vertexarray.h"
 #include <vector>
 
 // To enable NVIDIA Graphics card
@@ -23,50 +26,69 @@ int main()
 
 	glm::mat4 ortho = glm::ortho(0.0f, 20.0f, 0.0f, 20.0f);
 	shader.setUniformMat4("pr_matrix", ortho);
-	shader.setUniformMat4("ml_matrix", glm::translate(glm::mat4(), glm::vec3(5, 5, 0)));
-	
-	GLfloat points[] = {
-		0.0f,  0.0f, 0.0f,
-		5.0f, 10.0f, 0.0f,
-		10.0f, 0.0f, 0.0f
+
+	GLfloat vertices[] = {
+		5.0f,  5.0f, 0.0f,
+		5.0f, 15.0f, 0.0f,
+		15.0f,  15.0f, 0.0f,
+		15.0f,  5.0f, 0.0f
 	};
 
-	GLfloat colors[] = {
+	GLushort indices[] = {
+		0, 1, 3,
+		1, 2, 3
+	};
+
+	GLfloat colors1[] = {
 		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f
 	};
 
-	// Generate Vertex Array object
-	GLuint VAO;
-	glGenVertexArrays(1, &VAO);
+	GLfloat colors2[] = {
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f
+	};
 
-	// Generate Vertex Buffer objects for points and colors
-	GLuint points_vbo, colors_vbo;
-	glGenBuffers(1, &points_vbo);
-	glGenBuffers(1, &colors_vbo);
+	VertexArray sprite1, sprite2;
+	IndexBuffer ibo(indices, 6);
 
+	sprite1.addBuffer(new Buffer(vertices, 4 * 3, 3), 0);
+	sprite1.addBuffer(new Buffer(colors1,  4 * 3, 3), 1);
 
-	glBindVertexArray(VAO);
-	// For points
-	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	// For colors
-	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(1);
-	glBindVertexArray(0);
+	sprite2.addBuffer(new Buffer(vertices, 4 * 3, 3), 0);
+	sprite2.addBuffer(new Buffer(colors2,  4 * 3, 3), 1);
 
 	while (!window.closed())
 	{
 		window.clear();
-		glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLES, 0, 3);
-		glBindVertexArray(0);
+
+		glm::mat4 trans;
+		trans = glm::translate(trans, glm::vec3(5.0f, 5.0f, 0.0f));
+
+		glm::mat4 trans2;
+		trans2 = glm::translate(trans2, glm::vec3(-5.0f, -5.0f, 0.0f));
+
+		glm::vec2 mouse = window.getMousePosition();
+		float light_pos_x = mouse.x * 20 / 800;
+		float light_pos_y = 20 - mouse.y * 20 / 600;
+		shader.setUniform2f("light_pos", glm::vec2(light_pos_x, light_pos_y));
+
+		sprite1.bind();
+			ibo.bind();
+			shader.setUniformMat4("ml_matrix", trans);
+			glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_SHORT, 0);
+		sprite1.unbind();
+
+		sprite2.bind();
+			ibo.bind();
+			shader.setUniformMat4("ml_matrix", trans2);
+			glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_SHORT, 0);
+		sprite2.unbind();
+
 		window.update();
 	}
 
